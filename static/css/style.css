@@ -1,0 +1,52 @@
+html {
+  font-size: 18px;
+}
+@media (max-width:  768px)  {
+  html {
+    font-size: 15px;
+  }
+}
+
+body {
+	background-color: #FFFFFF;
+}
+img {
+    max-width:100%;
+    box-shadow:1px 1px 1px 1px;
+    margin:0.75rem 0;
+}
+section {
+    background:whitesmoke;
+    margin:0.5rem 0;
+    padding:1rem;
+    border-radius:0.5rem;
+}
+
+h2 {
+    background:crimson;
+    color:white;
+    font-weight:bold;
+    padding:0.25rem;
+
+}
+h3 {
+    border-left:double 0.5rem crimson;
+    border-bottom:solid 0.4rem crimson;
+    padding-left:0.5rem;
+    padding-bottom:0.4rem;
+}
+pre {
+    background:black;
+    padding:0.5rem;
+}
+pre code {
+    font-weight:bold;
+    color:#00ffcc;
+}
+.red {
+    color:crimson;
+    font-weight:bold;
+}
+
+
+

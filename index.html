@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Djangoのよくあるエラーと対策一覧</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script src="static/js/onload.js"></script>
+	<link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1 class="bg-primary text-white text-center">Djangoのよくあるエラーと対策の一覧</h1>
+    </header>
+
+    <main class="container">
+    
+        <nav>
+            <ul>
+                <li><a href="#q1">Q1:DisallowedHost at (許可されていないホスト)と表示される</a></li>
+                <li><a href="#q2">Q2:TemplateDoesNotExist at (テンプレートが存在しない)と表示される</a></li>
+                <li><a href="#q3">Q3:OperationalError no such table (オペレーションエラー、そのようなテーブルありません)と表示される</a></li>
+                <li><a href="#q4">Q4:Page not found (ページが存在しない)と表示されます</a></li>
+                <li><a href="#q5">Q5:アクセス禁止(403)、CSRF検証に失敗したためリクエストは中断されましたと表示される</a></li>
+                <li><a href="#q6">Q6:NoReverseMatch と表示される</a></li>
+            </ul>
+        </nav>
+
+        <section id="q1">
+        
+            <h2>Q1:DisallowedHost at (許可されていないホスト)と表示される</h2>
+
+            <div class="text-center"><img src="static/img/q1.png" alt="許可されていないホスト"></div>
+        
+
+            <p class="red">settings.pyのALLOWED_HOSTSにサーバーのドメイン名、もしくはIPアドレスが指定されていない可能性があります。</p>
+
+            <p>例えば、開発サーバーは127.0.0.1という自分自身を表すIPアドレスを指定して起動します。そのため、settings.pyの中にあるALLOWED_HOSTSには127.0.0.1を含めなければならないのです。</p>
+
+            <div class="text-center"><img src="static/img/a1.png" alt="127.0.0.1を含める"></div>
+
+            <p>また、デバッグモード(DEBUG=True)の場合はALLOWED_HOSTSを空欄にすることで、全てのドメイン名、IPアドレスを許可します。</p>
+        
+        </section>
+        <section id="q2">
+
+            <h2>Q2:TemplateDoesNotExist at (テンプレートが存在しない)と表示される</h2>
+
+            <div class="text-center"><img src="static/img/q2.png" alt="存在しないテンプレート"></div>
+
+            <p>views.pyでレンダリング指定しているテンプレートのパスが間違っているか、そもそもtemplatesディレクトリに対象のhtmlファイルが存在しないか、settings.pyのTEMPLATESにディレクトリの指定がされていない可能性があります。</p>
+
+            <h3>settings.pyの修正</h3>
+
+            <p>Djangoのプロジェクトディレクトリ直下にtemplatesディレクトリを作成して一括管理する場合、settings.pyのTEMPLATESのDIRに<code>os.path.join(BASE_DIR,"templates")</code>を追加する必要があります。</p>
+
+            <div class="text-center"><img src="static/img/a2-1.png" alt="settings.pyのTEMPLATESの書き換え"></div>
+
+            <h3>views.py、templates内のhtmlファイル名の修正</h3>
+
+            <p>下記画像のようにレンダリング時に呼び出しするファイル名と、呼び出されるhtmlファイルのファイル名が一致するようにコードを修正してください。</p>
+
+            <div class="text-center"><img src="static/img/a2-2.png" alt="レンダリング時のファイル名、対象のHTMLファイルを一致させる"></div>
+
+            <p>ちなみに、render関数はsettings.pyのTEMPLATESで指定したパスを自動的に読み込むようになっているので、templatesディレクトリまで指定する必要はありません。</p>
+            
+        </section>
+
+
+        <section id="q3">
+
+            <h2>Q3:OperationalError no such table (オペレーションエラー、そのようなテーブルありません)と表示される</h2>
+        
+            <div class="text-center"><img src="static/img/q3.png" alt="存在しないテーブル"></div>
+
+            <p>models.pyで定義した内容でマイグレーションされていない、models.pyで記述したテーブル名に誤りがある可能性があります。</p>
+
+
+            <h3>マイグレーションを実行してDBにテーブルを作る</h3>
+
+            <p>no such table(テーブルがありません)と表示されるということは、マイグレーションが実行されていない可能性があります。models.pyで定義した内容をDBに反映させ、テーブルを作らせるためには事前にマイグレーションしなければなりません。</p>
+
+            <p>テーブルが存在するかどうかチェックする場合は、SQLiteの場合、.tableコマンドでチェックできます。</p>
+
+            <div class="text-center"><img src="static/img/a3-0.png" alt="テーブル存在チェック"></div>
+
+            <p>DB内にテーブルが存在しません。マイグレーションを実行しましょう。</p>
+
+<pre><code>python3 manage.py makemigration
+python3 manage.py migrate
+</code></pre>
+
+            <p>GitHubなどからDLしたDjangoのプロジェクトにはマイグレーションファイルとdb.sqlite3が含まれていない事があります。そのため、開発サーバー起動前に事前にマイグレーションしておくなどの措置が必要です。</p>
+
+            <div class="text-center"><img src="static/img/a3-1.png" alt="テーブルが無いならマイグレーション"></div>
+
+            <p>ちなみに、注意しなければならないことは、settings.pyのINSTALLED_APPSに記述されたアプリでない限り、マイグレーションを実行してもmodels.pyに書かれた内容はDBに反映されないことです。予め、<span class="red">マイグレーションに反映させたいアプリのmodels.pyがsettings.pyのINSTALLED_APPSに含まれているかをチェック</span>しましょう。</p>
+
+            <div class="text-center"><img src="static/img/a3-1-1.png" alt="テーブルが無いならマイグレーション"></div>
+            
+            <h3>models.pyで指定したテーブル名が間違っていないことを確かめる</h3>
+
+            <p>何かの拍子にmodels.pyで定義しているテーブル名が書き換わった時、models.pyを参照しているviews.pyは誤ったテーブル名でDBにアクセスします。これではテーブル名が見つからないと言われても仕方がありません。</p>
+
+            <div class="text-center"><img src="static/img/a3-2.png" alt="models.pyで指定したテーブル名が書き換わっていないかチェックする"></div>
+
+            <p>もし、うっかりmodels.pyで定義したテーブル名を書き換えてしまった場合は、すぐに元に戻しましょう。元のテーブル名がわからない場合は、再びマイグレーションすることでも対策はできます。</p>
+
+        </section>
+        
+        <section id="q4">
+        
+            <h2>Q4:Page not found (ページが存在しない)と表示されます</h2>
+        
+            <div class="text-center"><img src="static/img/q4.png" alt="404error"></div>
+
+            <p>アクセスしたページが存在しないため、urls.pyの指定に問題があります。</p>
+
+            <h3>urls.pyの修正を行う</h3>
+
+            <p>上記の画像はRequest URL<code>http://127.0.0.1:8000/</code>にアクセスして404になっています。そして、urls.pyに定義されているURLはadmin/とbbs/のみです。</p>
+
+            <p><code>http://127.0.0.1:8000/admin/</code>もしくは<code>http://127.0.0.1:8000/bbs/</code>は定義されているので、問題なくアクセスできますが、<code>http://127.0.0.1:8000/</code>は定義されていないため404エラーになります。これはurls.pyの修正が必要です。</p>
+
+            <p>下記画像上部はconfig/urls.py、下部はbbs/urls.pyです。</p>
+
+            <div class="text-center"><img src="static/img/a4-1.png" alt="404error対策"></div>
+
+            <p><code>http://127.0.0.1:8000/</code>にアクセスするとPage not foundにしないようにするためには、config/urls.pyにトップページに当たる""を定義する必要があります。下記画像はbbsをトップページに表示させています。</p>
+
+            <div class="text-center"><img src="static/img/a4-2.png" alt="404error対策"></div>
+        
+        </section>
+
+        <section id="q5">
+
+            <h2>Q5:アクセス禁止(403)、CSRF検証に失敗したためリクエストは中断されましたと表示される</h2>
+
+            <div class="text-center"><img src="static/img/q5.png" alt="403エラー"></div>
+
+            <p>これはtemplatesの問題です。フォームを使用しているにもかかわらず、<code>{% csrf_token %}</code>がフォームタグ内に書き込まれていないことに問題があります。</p>
+
+            <p>例えば、下記画像は問題のない普通のフォームに見えますが、これは<a href="https://ja.wikipedia.org/wiki/%E3%82%AF%E3%83%AD%E3%82%B9%E3%82%B5%E3%82%A4%E3%83%88%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%83%95%E3%82%A9%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%AA">CSRF(クロスサイトリクエストフォージェリ)</a>の脆弱性があります。</p>
+        
+            <div class="text-center"><img src="static/img/a5-1.png" alt="CSRFの脆弱性アリ"></div>
+
+            <p>DjangoはCSRFの脆弱性があるフォームのリクエスト送信を許可しません。この問題を解決するためには、下記画像のようにフォームタグで囲まれている部分に<code>{% csrf_token %}</code>を追加しましょう。</p>
+
+            <div class="text-center"><img src="static/img/a5-2.png" alt="csrf_tokenを追加する"></div>
+
+            <p>ちなみにこの<code>{% csrf_token %}</code>、GET文のリクエストでは不要です。</p>
+        
+        </section>
+        <section id="q6">
+        
+            <h2>Q6:NoReverseMatch と表示される</h2>
+
+            <div class="text-center"><img src="static/img/q6.png" alt="NoReverseMatch"></div>
+
+            <p>NoReverseMatchは名前の逆引き失敗を意味しています。これはテンプレートもしくはurls.pyの問題です。</p>
+
+            <p>通常、リンクタグにURLを記述する時、URLをそのまま入力していると、パスが変わった時に全て書き換えを行わなければなりません。Djangoではその手間を省くため、URLに割り当てられたnameを記述することで、URLを逆引きしています。</p>
+
+            <div class="text-center"><img src="static/img/a4-2.png" alt="nameが指定されている"></div>
+            
+            <p>urls.py内のurlpatternsに含まれる、path関数の第三引数であるnameには文字列が指定されています。これがURLの逆引きに使用するnameです。今回のエラーのNoReverseMatchではこのurls.pyで指定したname、呼び出しをしているテンプレートに問題があるのです。</p>
+
+            <p>テンプレートでurlの逆引きを行う際、nameとnameは:で区切ります。下記のように定義したnameをきちんと呼び出せるように修正すればこのエラーは解決できます。</p>
+
+            <div class="text-center"><img src="static/img/a6.png" alt="テンプレートでnameを指定してURL逆引きを行う"></div>
+        
+        </section>
+
+    </main>
+
+
+
+</body>
+</html>
+
